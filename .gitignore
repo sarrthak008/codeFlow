@@ -1,0 +1,35 @@
+# dependencies
+*/node_modules/
+
+# env files
+*/.env
+
+# build folders
+*/dist/
+*/build/
+
+# expo
+*/.expo/
+*/.expo-shared/
+
+# logs
+*.log
+
+# mac
+.DS_Store
+
+# vscode
+.vscode/
+
+# coverage
+coverage/
+
+# uploads
+*/uploads/
+
+# firebase
+.firebase/
+
+# temp
+tmp/
+temp/
