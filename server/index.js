@@ -5,9 +5,18 @@ const PORT = 3000 || env.PORT;
 
 
 
+//middlewares
+app.use(express.json());
+app.use(express.urlencoded({extended:true}));
+import  _rateLimitor  from "./middlewares/limitor.js";
+
+// controllers
+import {executeJs} from "./controllers/js.controllers.js"
+
+app.post("/code/run",_rateLimitor,executeJs);
 
 app.get("/health",(req,res)=>{
-    return `server is running healthy...`;
+    return  res.json({message: `server is running healthy...`})
 })
 
 app.listen(PORT,()=>{
