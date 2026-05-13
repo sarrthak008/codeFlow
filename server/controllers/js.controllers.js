@@ -3,7 +3,7 @@ import responder from "../utils/responder.js";
 
 const executeJs = async (req, res) => {
     const { code } = req.body;
-
+    console.log(code)
     if (!code) {
         return responder(res, 404, null, false, 'please add code');
     }
