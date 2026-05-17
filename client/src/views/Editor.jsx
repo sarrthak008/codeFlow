@@ -2,28 +2,67 @@ import React, { useState } from "react";
 import Editor from "@monaco-editor/react";
 import axios from "axios"
 
+const ServerClientStatusHighlighter = ({ clientI = false, serverI = false }) => {
+    console.log(clientI, serverI)
+    return (
+        <div className="flex gap-4 opacity-50">
+            Server : <span className="flex items-center">{serverI ? <div className="h-[10px] w-[10px] rounded-full bg-red-500"></div> :
+                <div className="h-[10px] w-[10px] rounded-full bg-green-500"></div>
+            }</span>
+
+            Client : <span className="flex items-center">{clientI ? <div className="h-[10px] w-[10px] rounded-full bg-red-500"></div> :
+                <div className="h-[10px] w-[10px] rounded-full bg-green-500"></div>
+            }</span>
+        </div>
+    )
+}
+
+
 const CodeEditor = () => {
 
 
     let starterCode = "//hello"
     const [code, setCode] = useState(starterCode);
-    const [output, setOutput] = useState([]);
-    const [error, setError] = useState();
-  
-    // execute code
+    const [output, setOutput] = useState({});
+    const [isUserWriteCode, setIsUserWriteCode] = useState(false);
+
     const runCode = async () => {
+        setIsUserWriteCode(code.trim() !== starterCode.trim())
+
         try {
-            let result = await axios.post(`http://localhost:3000/code/run`, {
-                code
-            })
-            if (result.data.success) {
-                let serverOutput = result.data?.data?.logs;
-                setOutput(serverOutput)
-            } else {
+            const result = await axios.post("http://localhost:3000/code/run", { code });
+            console.log(result);
+            setOutput({
+                isSuccess: true,
+                isClientIessue: false,
+                output: result?.data?.data?.output,
+                logs: result?.data?.data?.logs,
+                error: null,
+            });
+
+        } catch (error) {
+            console.log(error);
+            // SERVER ERROR RESPONSE
+            if (error.response) {
+                setOutput({
+                    isSuccess: false,
+                    isClientIessue: false,
+                    output: error?.response?.data?.data?.error || "Execution Error",
+                    logs: error?.response?.data?.data?.logs || [],
+                    error: error?.response?.data?.message || "Server Error",
+                });
 
             }
-        } catch (error) {
-
+            // NETWORK ERROR
+            else {
+                setOutput({
+                    isSuccess: false,
+                    isClientIessue: true,
+                    output: error.message || "Network Error",
+                    logs: [],
+                    error: "Cannot connect to server",
+                });
+            }
         }
     };
 
@@ -70,21 +109,42 @@ const CodeEditor = () => {
                         Console Output
                     </h2>
                     <div className="flex items-center gap-3">
-                        <button
-                            onClick={runCode}
-                            className="flex cursor-pointer items-center gap-2 px-4 py-2 text-sm transition-all"
-                        >
-                            <i className="ri-play-fill"></i>
-                            Run
-                        </button>
-                        {/* submit button */}
-                        <button
-                            onClick={submitAnswer}
-                            className="flex cursor-pointer items-center gap-2 px-4 py-2  rounded-lg text-sm transition-all"
-                        >
-                            <i className="ri-upload-2-fill"></i>
-                            Submit
-                        </button>
+                        <span>
+                            <ServerClientStatusHighlighter clientI={output.isClientIessue} serverI={output.isSuccess} />
+                        </span>
+                        {
+                            isUserWriteCode ?
+                                <button
+                                    onClick={runCode}
+                                    className="flex cursor-pointer items-center gap-2 px-4 py-2 text-sm transition-all"
+                                >
+                                    <i className="ri-play-fill"></i>
+                                    Run
+                                </button> : <button
+                                    disabled
+                                    className="flex text-gray-400  cursor-not-allowed items-center gap-2 px-4 py-2 text-sm transition-all"
+                                >
+                                    <i className="ri-play-fill"></i>
+                                    Run
+                                </button>
+                        }
+
+                        {
+                            isUserWriteCode ?
+                                <button
+                                    onClick={submitAnswer}
+                                    className="flex cursor-pointer items-center gap-2 px-4 py-2  rounded-lg text-sm transition-all"
+                                >
+                                    <i className="ri-upload-2-fill"></i>
+                                    Submit
+                                </button> :
+                                <button
+                                    className="flex  text-gray-400 cursor-not-allowed items-center gap-2 px-4 py-2  rounded-lg text-sm transition-all"
+                                >
+                                    <i className="ri-upload-2-fill"></i>
+                                    Submit
+                                </button>
+                        }
 
                         {/* clear console */}
                         <button
@@ -102,24 +162,25 @@ const CodeEditor = () => {
                 <div className="flex-1 p-4 overflow-auto">
                     <div className="space-y-3">
                         {
-                            output.length === 0 &&  (
-                                <p className="text-gray-500 text-sm">
-                                    Run your code to see output...
-                                </p>
-                            )
+                            output.isSuccess ?
+                                <div>
+                                    <p>Result: {output?.output}</p>
+                                    <div>
+                                        {output?.logs?.map((op) => (
+                                            <div>{op}</div>
+                                        ))}
+                                    </div>
+                                </div> : <div>
+                                    {
+                                        <>
+                                            <span className="text-red-400">{output.output}</span>
+                                        </>
+                                    }
+                                </div>
                         }
-                        {
-                            output?.map((op) => (
-                                <div>{op}</div>
-                            ))
-                        }
-
                     </div>
-
                 </div>
-
             </div>
-
         </div>
     );
 };
