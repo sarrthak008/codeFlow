@@ -112,7 +112,7 @@ const executeJs = async (req, res) => {
         };
 
         const vm = new VM({
-            timeout: 2000,
+            timeout: 5000,
             eval: false,
             wasm: false,
             allowAsync: true,
