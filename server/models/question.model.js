@@ -6,6 +6,10 @@ const questionSchema = new Schema({
         required: [true, "Question title is required"],
         trim: true,
     },
+    codeFlowAiData :{
+        type : Schema.Types.Mixed,
+        required :[true , "Quation Store failed"]
+    },
     userId: {
         type: Schema.Types.ObjectId,
         ref: "User",

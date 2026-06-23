@@ -26,12 +26,13 @@ import { protectRoute } from "./middlewares/protectRoute.js";
 // controllers
 import { executeJs } from "./controllers/js.controllers.js"
 import {addManyUsers, login} from  "./controllers/auth/auth.controller.js"
-import { genarateQuestions } from "./controllers/code/code.js";
+import { genarateQuestions, submitAnswer } from "./controllers/code/code.js";
 
 app.post("/code/run", _rateLimitor, executeJs);
 app.post("/auth/login" ,login);
 app.get("/auth/adduser" , addManyUsers);
 app.get("/codeflow/genarate",protectRoute,genarateQuestions);
+app.post("/codeflow/submit",protectRoute,submitAnswer);
 
 app.get("/health", (req, res) => {
     return res.json({ message: `server is running healthy...` })
