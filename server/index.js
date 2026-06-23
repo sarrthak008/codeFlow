@@ -9,11 +9,9 @@ import cors from "cors"
 // db connetion 
  import connectdb from "./config/connectdb.js";
 
-
-
 //middlewares
 app.use(cors({
-    origin: "http://localhost:5173",
+    origin: ["http://localhost:5173"],
     credentials: true,
 }))
 
@@ -27,10 +25,11 @@ import { protectRoute } from "./middlewares/protectRoute.js";
 import { executeJs } from "./controllers/js.controllers.js"
 import {addManyUsers, login} from  "./controllers/auth/auth.controller.js"
 import { genarateQuestions, submitAnswer } from "./controllers/code/code.js";
+import verifyAdmin from "./middlewares/verifyadmins.js";
 
 app.post("/code/run", _rateLimitor, executeJs);
 app.post("/auth/login" ,login);
-app.get("/auth/adduser" , addManyUsers);
+app.post("/auth/adduser" ,verifyAdmin, addManyUsers);
 app.get("/codeflow/genarate",protectRoute,genarateQuestions);
 app.post("/codeflow/submit",protectRoute,submitAnswer);
 
