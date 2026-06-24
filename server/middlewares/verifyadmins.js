@@ -1,9 +1,9 @@
 import jwt from "jsonwebtoken";
 import responder from "../utils/responder.js";
 
-const JWT_SECRET = process.env.JWT_SECRET;
 
 const verifyAdmin = async (req, res, next) => {
+    const JWT_SECRET = process.env.JWT_SECRET;
     try {
         const authHeader = req.headers.authorization;
         if (!authHeader || !authHeader.startsWith("Bearer ")) {

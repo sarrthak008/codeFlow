@@ -3,6 +3,7 @@ import Editor from "@monaco-editor/react";
 import axios from "axios";
 import Login from "../components/Login";
 import execturcmd from "../../utils/execute";
+import useUser from "../hooks/getUser";
 
 // ============================================================================
 // 📊 INTEGRATED COMPACT REPORT CARD MODAL COMPONENT (A4 / SIZE OPTIMIZED)
@@ -326,7 +327,7 @@ const ConsoleTerminalPanel = ({
                         ))}
 
                         <div className="flex items-center gap-2 mt-2">
-                            <span className="text-green-400">
+                            <span className="text-green-400 text-xl">
                                 root@codeflow(admin):~$
                             </span>
 
@@ -338,7 +339,7 @@ const ConsoleTerminalPanel = ({
                                 }
                                 onKeyDown={handleAdminSubmit}
                                 disabled={isCommandRunning}
-                                className="flex-1 bg-transparent outline-none text-white"
+                                className="flex-1 text-xl bg-transparent outline-none text-white"
                                 placeholder="Enter command..."
                             />
 
@@ -416,6 +417,10 @@ const CodeEditor = () => {
         return "// Welcome! Click the '+' button to fetch your daily AI challenge.";
     };
 
+    let userInfo  = useUser();
+    console.log(userInfo)
+    const [user,SetUser] = useState({name : userInfo?.user?.name || "" ,role : userInfo?.user?.role || 'user' , isAdmin : userInfo?.user?.role == 'admin' ? true : false});
+    console.log(user)
     const [code, setCode] = useState(getInitialCode());
     const [isLoading, setIsLoading] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -579,6 +584,7 @@ ${challenge.starterCode || "// Write your solution logic below\n"}`;
         setIsUserWriteCode(code.trim() !== baselineText.trim());
     }, [code]);
 
+   
     return (
         <div
             className="w-full h-screen bg-[#0f172a] text-white flex flex-col overflow-hidden"
@@ -602,7 +608,7 @@ ${challenge.starterCode || "// Write your solution logic below\n"}`;
                 isLoading={isLoading}
                 isSubmitting={isSubmitting}
                 onRunCode={runCode}
-                isAdmin={true}
+                isAdmin={user.isAdmin}
                 onSubmitAnswer={submitAnswer}
                 onGenerateNewQuestion={handleGenerateNewQuestion}
                 onOpenLogin={() => setIsLoginScreen(true)}
@@ -613,7 +619,7 @@ ${challenge.starterCode || "// Write your solution logic below\n"}`;
                 isOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)}
                 reviewData={aiReviewData}
-                userName="Sarthak Navale"
+                userName= {user.name}
             />
 
             {isLoginScreen && (

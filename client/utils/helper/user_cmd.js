@@ -6,7 +6,8 @@ const adduser = async ([name, password, role = "user"]) => {
             return "Usage: add-user <name> <password> [role]";
         }
 
-        const token = localStorage.getItem("token");
+        const token = localStorage.getItem("authToken");
+        if(!token) return "check the session"
 
         const { data } = await axios.post(
             "http://localhost:3000/auth/adduser",

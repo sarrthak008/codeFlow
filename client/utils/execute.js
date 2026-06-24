@@ -2,7 +2,7 @@ import { adduser } from "./helper/user_cmd.js";
 
 const executeCommand = async (input) => {
     const [commandName, ...parameters] = input.trim().split(/\s+/);
-
+    
     switch (commandName) {
        
         case "adduser":
