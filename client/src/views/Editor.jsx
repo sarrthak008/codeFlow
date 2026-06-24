@@ -5,6 +5,8 @@ import Login from "../components/Login";
 import execturcmd from "../../utils/execute";
 import useUser from "../hooks/getUser";
 
+const DBURL = import.meta.env.VITE_BACKEND_URL
+
 // ============================================================================
 // 📊 INTEGRATED COMPACT REPORT CARD MODAL COMPONENT (A4 / SIZE OPTIMIZED)
 // ============================================================================
@@ -473,7 +475,7 @@ const CodeEditor = () => {
 
     const runCode = async () => {
         try {
-            const result = await axios.post("http://localhost:3000/code/run", { code });
+            const result = await axios.post(`${DBURL}/code/run`, { code });
             setOutput({
                 hasRun: true,
                 isSuccess: true,
@@ -510,7 +512,7 @@ const CodeEditor = () => {
             setIsLoading(true);
             const token = localStorage.getItem("authToken");
 
-            const response = await axios.get("http://localhost:3000/codeflow/genarate", {
+            const response = await axios.get(`${DBURL}/codeflow/genarate`, {
                 withCredentials: true,
                 headers: {
                     Authorization: token ? `Bearer ${token}` : ""
@@ -556,7 +558,7 @@ ${challenge.starterCode || "// Write your solution logic below\n"}`;
             setIsSubmitting(true);
             const token = localStorage.getItem("authToken");
 
-            const response = await axios.post("http://localhost:3000/codeflow/submit", {
+            const response = await axios.post(`${DBURL}/codeflow/submit`, {
                 quesitonId: activeChallenge.questionId,
                 code: code
             }, {

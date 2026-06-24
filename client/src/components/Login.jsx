@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import useUser from "../hooks/getUser";
 
+const DBURL = import.meta.env.VITE_BACKEND_URL
+
 const Login = ({ onLoginSuccess, isLoginScreen, setIsLoginScreen }) => {
     const [formData, setFormData] = useState({
         name: "",
@@ -35,7 +37,7 @@ const Login = ({ onLoginSuccess, isLoginScreen, setIsLoginScreen }) => {
 
         setIsLoading(true);
         try {
-            const response = await axios.post("http://localhost:3000/auth/login", {
+            const response = await axios.post(`${DBURL}/auth/login`, {
                 name: formData.name.trim(),
                 password: formData.password
             });

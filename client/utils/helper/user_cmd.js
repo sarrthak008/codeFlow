@@ -1,4 +1,6 @@
 import axios from "axios";
+const DBURL = import.meta.env.VITE_BACKEND_URL
+
 
 const adduser = async ([name, password, role = "user"]) => {
     try {
@@ -10,7 +12,7 @@ const adduser = async ([name, password, role = "user"]) => {
         if(!token) return "check the session"
 
         const { data } = await axios.post(
-            "http://localhost:3000/auth/adduser",
+            `${DBURL}/auth/adduser`,
             {
                 users: [
                     {
