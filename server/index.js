@@ -11,7 +11,7 @@ import cors from "cors"
 
 //middlewares
 app.use(cors({
-    origin: ["http://localhost:5173"],
+    origin: ["http://localhost:5173" , "https://codeefloww.vercel.app"],
     credentials: true,
 }))
 
