@@ -4,7 +4,8 @@ import axios from "axios";
 import Login from "../components/Login";
 import execturcmd from "../../utils/execute";
 import useUser from "../hooks/getUser";
-
+import LeaderBoard from "../components/LeaderBoard";
+import { toast } from "sonner";
 const DBURL = import.meta.env.VITE_BACKEND_URL
 
 // ============================================================================
@@ -19,20 +20,16 @@ const CertificateModal = ({ isOpen, onClose, reviewData, userName = "Sarthak Nav
         const canvas = canvasRef.current;
         const ctx = canvas.getContext("2d");
 
-        // 1. Set optimized, smaller report dimensions (Compact & high-pixel-density ready)
         canvas.width = 560;
         canvas.height = 720;
 
-        // 2. Base Modern Charcoal/Dark Slate Report Background
         ctx.fillStyle = "#0f172a";
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-        // 3. Tech Accent Border Frame
         ctx.strokeStyle = "rgba(56, 189, 248, 0.2)";
         ctx.lineWidth = 2;
         ctx.strokeRect(15, 15, canvas.width - 30, canvas.height - 30);
 
-        // Subdued background blueprint grid line matrix
         ctx.strokeStyle = "rgba(255, 255, 255, 0.015)";
         ctx.lineWidth = 1;
         for (let i = 20; i < canvas.width; i += 25) {
@@ -42,7 +39,6 @@ const CertificateModal = ({ isOpen, onClose, reviewData, userName = "Sarthak Nav
             ctx.beginPath(); ctx.moveTo(20, j); ctx.lineTo(canvas.width - 20, j); ctx.stroke();
         }
 
-        // 4. Report Header Panel
         ctx.fillStyle = "#020617";
         ctx.fillRect(30, 30, canvas.width - 60, 50);
         ctx.strokeStyle = "rgba(255, 255, 255, 0.08)";
@@ -60,7 +56,6 @@ const CertificateModal = ({ isOpen, onClose, reviewData, userName = "Sarthak Nav
         const dateStr = new Date().toLocaleDateString("en-US", { year: 'numeric', month: 'short', day: 'numeric' });
         ctx.fillText(dateStr, canvas.width - 45, 55);
 
-        // 5. Developer Data Rows
         ctx.textAlign = "left";
         ctx.fillStyle = "rgba(255, 255, 255, 0.4)";
         ctx.font = "10px monospace";
@@ -69,7 +64,6 @@ const CertificateModal = ({ isOpen, onClose, reviewData, userName = "Sarthak Nav
         ctx.font = "bold 16px monospace";
         ctx.fillText(userName.toUpperCase(), 35, 128);
 
-        // Metric Score Indicator Segment Box
         ctx.fillStyle = "rgba(255, 255, 255, 0.4)";
         ctx.font = "10px monospace";
         ctx.fillText("OVERALL SCORE:", 35, 165);
@@ -77,7 +71,6 @@ const CertificateModal = ({ isOpen, onClose, reviewData, userName = "Sarthak Nav
         ctx.font = "bold 18px monospace";
         ctx.fillText(`${reviewData.score || 0} / 100 [${reviewData.status?.toUpperCase() || "PASSED"}]`, 35, 183);
 
-        // Text wrapper helper engine micro method
         const wrapText = (context, text, x, y, maxWidth, lineHeight) => {
             const words = text.split(" ");
             let line = "";
@@ -97,7 +90,6 @@ const CertificateModal = ({ isOpen, onClose, reviewData, userName = "Sarthak Nav
             return currentY + lineHeight;
         };
 
-        // 6. AI Assessment Overview Feedback Content Block
         ctx.fillStyle = "rgba(255, 255, 255, 0.4)";
         ctx.font = "10px monospace";
         ctx.fillText("CRITICAL REFLECTION & BREAKDOWN SUMMARY:", 35, 220);
@@ -106,7 +98,6 @@ const CertificateModal = ({ isOpen, onClose, reviewData, userName = "Sarthak Nav
         const fbText = reviewData.feedback || "Compilation successful. Core baseline validation assertions passed matching production environment models.";
         const endFbY = wrapText(ctx, fbText, 35, 240, canvas.width - 70, 16);
 
-        // 7. Optimization Actionable Refactoring Tips
         const tipsY = Math.max(endFbY + 15, 305);
         ctx.fillStyle = "rgba(255, 255, 255, 0.4)";
         ctx.font = "10px monospace";
@@ -120,7 +111,6 @@ const CertificateModal = ({ isOpen, onClose, reviewData, userName = "Sarthak Nav
             nextTipY = wrapText(ctx, `[${idx + 1}] ${tip}`, 35, nextTipY, canvas.width - 70, 16);
         });
 
-        // 8. Correct Reference Solution Block Code Panel Terminal Window
         const terminalY = Math.max(nextTipY + 20, 420);
         const terminalHeight = (canvas.height - 45) - terminalY;
 
@@ -129,14 +119,12 @@ const CertificateModal = ({ isOpen, onClose, reviewData, userName = "Sarthak Nav
         ctx.strokeStyle = "rgba(255, 255, 255, 0.06)";
         ctx.strokeRect(30, terminalY, canvas.width - 60, terminalHeight);
 
-        // Terminal Top Title Tab
         ctx.fillStyle = "#1e293b";
         ctx.fillRect(31, terminalY + 1, canvas.width - 62, 22);
         ctx.fillStyle = "rgba(255, 255, 255, 0.5)";
         ctx.font = "bold 9px monospace";
         ctx.fillText("SUGGESTED PARSED OPTIMAL REFERENCE LOGIC", 42, terminalY + 12);
 
-        // Inject compiled string content matrices code safely down
         ctx.fillStyle = "#cbd5e1";
         ctx.font = "11px monospace";
         let lineY = terminalY + 45;
@@ -149,7 +137,6 @@ const CertificateModal = ({ isOpen, onClose, reviewData, userName = "Sarthak Nav
             lineY += 15;
         });
 
-        // 9. Tiny Frame Footer Secure Hash Key Index Signature
         ctx.fillStyle = "rgba(255, 255, 255, 0.15)";
         ctx.font = "8px monospace";
         ctx.textAlign = "center";
@@ -202,27 +189,119 @@ const CertificateModal = ({ isOpen, onClose, reviewData, userName = "Sarthak Nav
 // 📊 SYSTEM STATUS DOT HIGHLIGHTER
 // ============================================================================
 const ServerClientStatusHighlighter = ({ clientI = false, serverI = false, hasRun = false }) => {
-    return (
-        <div className="flex gap-4 opacity-50 text-xs font-mono">
-            Server : <span className="flex items-center">
-                {!hasRun ? (
-                    <div className="h-[10px] w-[10px] rounded-full bg-gray-500"></div>
-                ) : serverI ? (
-                    <div className="h-[10px] w-[10px] rounded-full bg-green-500"></div>
-                ) : (
-                    <div className="h-[10px] w-[10px] rounded-full bg-red-500"></div>
-                )}
-            </span>
+    // ✅ FIX: moved hover state into proper useState; removed setter call during render
+    const [isVisible, setIsVisible] = useState(false);
 
-            Client : <span className="flex items-center">
-                {!hasRun ? (
-                    <div className="h-[10px] w-[10px] rounded-full bg-gray-500"></div>
-                ) : clientI ? (
-                    <div className="h-[10px] w-[10px] rounded-full bg-red-500"></div>
-                ) : (
-                    <div className="h-[10px] w-[10px] rounded-full bg-green-500"></div>
-                )}
-            </span>
+    return (
+        <div
+            className="bg-gray-600/50 cursor-pointer text-sm px-3 rounded-sm flex items-center justify-center relative"
+            onMouseEnter={() => setIsVisible(true)}
+            onMouseLeave={() => setIsVisible(false)}
+        >
+            staus
+            {isVisible && (
+                <div className="absolute h-[40px] flex items-center justify-center w-[200px] backdrop-blur-sm z-[99] rounded-2xl bottom-[150%] bg-gray-500/50">
+                    <div className="flex gap-4 opacity-50 text-xs font-mono">
+                        Server : <span className="flex items-center">
+                            {!hasRun ? (
+                                <div className="h-[10px] w-[10px] rounded-full bg-gray-500"></div>
+                            ) : serverI ? (
+                                <div className="h-[10px] w-[10px] rounded-full bg-green-500"></div>
+                            ) : (
+                                <div className="h-[10px] w-[10px] rounded-full bg-red-500"></div>
+                            )}
+                        </span>
+
+                        Client : <span className="flex items-center">
+                            {!hasRun ? (
+                                <div className="h-[10px] w-[10px] rounded-full bg-gray-500"></div>
+                            ) : clientI ? (
+                                <div className="h-[10px] w-[10px] rounded-full bg-red-500"></div>
+                            ) : (
+                                <div className="h-[10px] w-[10px] rounded-full bg-green-500"></div>
+                            )}
+                        </span>
+                    </div>
+                </div>
+            )}
+        </div>
+    );
+};
+
+
+// ============================================================================
+// ⚡ CONSOLE PROGRESS BAR — slim animated bar shown while code is running
+// ============================================================================
+const ConsoleProgressBar = ({ isRunning }) => {
+    const [width, setWidth] = useState(0);
+    const [visible, setVisible] = useState(false);
+    const timerRef = useRef(null);
+    const rafRef = useRef(null);
+
+    useEffect(() => {
+        if (isRunning) {
+            setVisible(true);
+            setWidth(0);
+
+            // Animate to ~85% quickly, then crawl — mimics NProgress
+            let start = null;
+            const animate = (ts) => {
+                if (!start) start = ts;
+                const elapsed = ts - start;
+                // Fast ramp to 70% in 400ms, then slow crawl toward 90%
+                let target;
+                if (elapsed < 400) {
+                    target = (elapsed / 400) * 70;
+                } else {
+                    target = 70 + Math.min(20, (elapsed - 400) / 100);
+                }
+                setWidth(target);
+                rafRef.current = requestAnimationFrame(animate);
+            };
+            rafRef.current = requestAnimationFrame(animate);
+        } else {
+            // Complete the bar then fade out
+            cancelAnimationFrame(rafRef.current);
+            setWidth(100);
+            timerRef.current = setTimeout(() => {
+                setVisible(false);
+                setWidth(0);
+            }, 350);
+        }
+
+        return () => {
+            cancelAnimationFrame(rafRef.current);
+            clearTimeout(timerRef.current);
+        };
+    }, [isRunning]);
+
+    if (!visible) return null;
+
+    return (
+        <div
+            style={{
+                position: "absolute",
+                top: 0,
+                left: 0,
+                right: 0,
+                height: "2px",
+                zIndex: 30,
+                overflow: "hidden",
+                pointerEvents: "none",
+            }}
+        >
+            <div
+                style={{
+                    height: "100%",
+                    width: `${width}%`,
+                    background: "linear-gradient(90deg, #38bdf8, #818cf8)",
+                    transition: isRunning
+                        ? "width 0.1s linear"
+                        : "width 0.25s ease-out",
+                    boxShadow: "0 0 6px #38bdf8aa",
+                    borderRadius: "0 2px 2px 0",
+                }}
+            />
         </div>
     );
 };
@@ -233,6 +312,7 @@ const ConsoleTerminalPanel = ({
     output,
     isUserWriteCode,
     isSubmitting,
+    isLoading,          // ✅ added to destructure (was passed but missing here)
     isAdmin = false,
     onRunCode,
     onSubmitAnswer,
@@ -242,6 +322,18 @@ const ConsoleTerminalPanel = ({
     const [adminCommand, setAdminCommand] = useState("");
     const [terminalHistory, setTerminalHistory] = useState([]);
     const [isCommandRunning, setIsCommandRunning] = useState(false);
+
+    // ✅ Track run state locally so the progress bar knows when to animate
+    const [isRunning, setIsRunning] = useState(false);
+
+    const handleRunCode = async () => {
+        setIsRunning(true);
+        try {
+            await onRunCode();
+        } finally {
+            setIsRunning(false);
+        }
+    };
 
     const handleAdminSubmit = async (e) => {
         if (e.key !== "Enter" || !adminCommand.trim()) return;
@@ -257,8 +349,7 @@ const ConsoleTerminalPanel = ({
         setIsCommandRunning(true);
 
         try {
-            const result = await execturcmd(command)
-
+            const result = await execturcmd(command);
             setTerminalHistory((prev) => [
                 ...prev,
                 result || "Command executed"
@@ -276,8 +367,11 @@ const ConsoleTerminalPanel = ({
     return (
         <div
             className="bg-black flex flex-col border-t border-gray-800"
-            style={{ height: `${consoleHeight}px` }}
+            style={{ height: `${consoleHeight}px`, position: "relative" }}
         >
+            {/* ✅ Progress bar sits at the very top of the panel */}
+            <ConsoleProgressBar isRunning={isRunning} />
+
             {/* Toolbar */}
             <div className="w-full px-4 py-2 border-b border-gray-800 flex items-center justify-between shrink-0 select-none">
                 <h2 className="text-green-400 font-medium flex items-center gap-2 text-sm">
@@ -289,12 +383,43 @@ const ConsoleTerminalPanel = ({
                         serverI={output.isSuccess}
                         hasRun={output.hasRun}
                     />
-                    <button disabled={!isUserWriteCode} onClick={onRunCode} className="text-white hover:text-green-400 text-sm flex items-center gap-2"><i className="ri-play-fill"></i> Run</button>
-                    <button disabled={!isUserWriteCode || isSubmitting} onClick={onSubmitAnswer} className="text-white hover:text-white/50 text-sm flex items-center gap-1"><i className={isSubmitting ? "ri-loader-4-line animate-spin" : "ri-upload-2-fill"}></i> Submit</button>
-                    <button onClick={onGenerateNewQuestion} className="w-8 h-8 flex items-center justify-center rounded bg-[#111827] border border-gray-800 text-green-400"><i className="ri-add-line"></i></button>
-                    <button onClick={onOpenLogin} className="w-8 h-8 flex items-center justify-center rounded bg-[#111827] border border-gray-800 text-blue-400"><i className="ri-shield-user-fill"></i></button>
+                    <button
+                        disabled={!isUserWriteCode || isRunning}
+                        onClick={handleRunCode}
+                        className="text-white hover:text-green-400 text-sm flex items-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed transition-opacity"
+                    >
+                        {/* ✅ Icon swaps to spinner while running */}
+                        <i className={isRunning ? "ri-loader-4-line animate-spin" : "ri-play-fill"}></i>
+                        Run
+                    </button>
+                    <button
+                        disabled={!isUserWriteCode || isSubmitting}
+                        onClick={onSubmitAnswer}
+                        className="text-white hover:text-white/50 text-sm flex items-center gap-1 disabled:opacity-40 disabled:cursor-not-allowed"
+                    >
+                        <i className={isSubmitting ? "ri-loader-4-line animate-spin" : "ri-upload-2-fill"}></i>
+                        Submit
+                    </button>
+
+                    {/* ✅ + button shows spinner while isLoading (generating question) */}
+                    <button
+                        onClick={onGenerateNewQuestion}
+                        disabled={isLoading}
+                        className="w-8 h-8 flex items-center justify-center rounded bg-[#111827] border border-gray-800 text-green-400 disabled:opacity-50 disabled:cursor-not-allowed transition-opacity"
+                        title="Generate new question"
+                    >
+                        <i className={isLoading ? "ri-loader-4-line animate-spin" : "ri-add-line"}></i>
+                    </button>
+
+                    <button
+                        onClick={onOpenLogin}
+                        className="w-8 h-8 flex items-center justify-center rounded bg-[#111827] border border-gray-800 text-blue-400"
+                    >
+                        <i className="ri-shield-user-fill"></i>
+                    </button>
                 </div>
             </div>
+
             {/* Terminal Area */}
             <div className="flex-1 overflow-auto p-4 font-mono text-xs text-gray-300">
                 {!output.hasRun ? (
@@ -308,7 +433,6 @@ const ConsoleTerminalPanel = ({
                                 Result: {output.output}
                             </span>
                         </div>
-
                         {output.logs?.map((log, index) => (
                             <div key={index}>{log}</div>
                         ))}
@@ -319,7 +443,6 @@ const ConsoleTerminalPanel = ({
                     </div>
                 )}
 
-                {/* Admin Terminal History */}
                 {isAdmin && (
                     <>
                         {terminalHistory.map((line, index) => (
@@ -332,19 +455,15 @@ const ConsoleTerminalPanel = ({
                             <span className="text-green-400 text-xl">
                                 root@codeflow(admin):~$
                             </span>
-
                             <input
                                 type="text"
                                 value={adminCommand}
-                                onChange={(e) =>
-                                    setAdminCommand(e.target.value)
-                                }
+                                onChange={(e) => setAdminCommand(e.target.value)}
                                 onKeyDown={handleAdminSubmit}
                                 disabled={isCommandRunning}
                                 className="flex-1 text-xl bg-transparent outline-none text-white"
                                 placeholder="Enter command..."
                             />
-
                             {isCommandRunning && (
                                 <i className="ri-loader-4-line animate-spin text-gray-500"></i>
                             )}
@@ -355,7 +474,6 @@ const ConsoleTerminalPanel = ({
         </div>
     );
 };
-
 
 
 // ============================================================================
@@ -419,15 +537,14 @@ const CodeEditor = () => {
         return "// Welcome! Click the '+' button to fetch your daily AI challenge.";
     };
 
-    let userInfo  = useUser();
-    console.log(userInfo)
-    const [user,SetUser] = useState({name : userInfo?.user?.name || "" ,role : userInfo?.user?.role || 'user' , isAdmin : userInfo?.user?.role == 'admin' ? true : false});
-    console.log(user)
+    let userInfo = useUser();
+    console.log(userInfo);
+    const [user, SetUser] = useState({ name: userInfo?.user?.name || "", role: userInfo?.user?.role || 'user', isAdmin: userInfo?.user?.role == 'admin' ? true : false });
+    console.log(user);
     const [code, setCode] = useState(getInitialCode());
     const [isLoading, setIsLoading] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
 
-    // Canvas Card Modal Control States
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [aiReviewData, setAiReviewData] = useState(null);
 
@@ -442,9 +559,6 @@ const CodeEditor = () => {
     const [isUserWriteCode, setIsUserWriteCode] = useState(false);
     const [isLoginScreen, setIsLoginScreen] = useState(false);
 
-    // ========================================================================
-    // 🖱️ DRAG TO RESIZE PANEL CONFIGURATION
-    // ========================================================================
     const [consoleHeight, setConsoleHeight] = useState(160);
     const [isDragging, setIsDragging] = useState(false);
 
@@ -457,9 +571,7 @@ const CodeEditor = () => {
             }
         };
 
-        const handleMouseUp = () => {
-            setIsDragging(false);
-        };
+        const handleMouseUp = () => setIsDragging(false);
 
         if (isDragging) {
             document.addEventListener("mousemove", handleMouseMove);
@@ -471,7 +583,6 @@ const CodeEditor = () => {
             document.removeEventListener("mouseup", handleMouseUp);
         };
     }, [isDragging]);
-    // ========================================================================
 
     const runCode = async () => {
         try {
@@ -540,7 +651,7 @@ ${challenge.starterCode || "// Write your solution logic below\n"}`;
             }
         } catch (error) {
             console.error("Failed to sync AI pipeline question:", error);
-            alert(error.response?.data?.message || "Authentication missing or session expired.");
+            toast.error(error.response?.data?.message || "Authentication missing or session expired.");
         } finally {
             setIsLoading(false);
         }
@@ -550,7 +661,7 @@ ${challenge.starterCode || "// Write your solution logic below\n"}`;
         try {
             const activeChallengeRaw = localStorage.getItem("activeChallenge");
             if (!activeChallengeRaw) {
-                alert("Please generate a problem profile first before submitting solutions.");
+                toast.error("Please generate a problem profile first before submitting solutions.");
                 return;
             }
             const activeChallenge = JSON.parse(activeChallengeRaw);
@@ -574,7 +685,7 @@ ${challenge.starterCode || "// Write your solution logic below\n"}`;
             }
         } catch (error) {
             console.error("Submission error encountered:", error);
-            alert(error.response?.data?.message || "Submission lifecycle processing failure.");
+            toast.error(error.response?.data?.message || "Submission lifecycle processing failure.");
         } finally {
             setIsSubmitting(false);
         }
@@ -582,27 +693,25 @@ ${challenge.starterCode || "// Write your solution logic below\n"}`;
 
     useEffect(() => {
         const savedChallenge = localStorage.getItem("activeChallenge");
-        const baselineText = savedChallenge ? JSON.parse(savedChallenge).editorLayoutText : "// Welcome! Click the '+' button to fetch your daily AI challenge.";
+        const baselineText = savedChallenge
+            ? JSON.parse(savedChallenge).editorLayoutText
+            : "// Welcome! Click the '+' button to fetch your daily AI challenge.";
         setIsUserWriteCode(code.trim() !== baselineText.trim());
     }, [code]);
 
-   
     return (
         <div
             className="w-full h-screen bg-[#0f172a] text-white flex flex-col overflow-hidden"
             style={{ userSelect: isDragging ? 'none' : 'auto' }}
         >
-            {/* Component 1: Editor Workspace */}
             <MonacoEditorPanel code={code} setCode={setCode} />
 
-            {/* ↕️ INTERACTIVE DRAG DIVIDER RESIZE BAR */}
             <div
                 onMouseDown={() => setIsDragging(true)}
                 className={`w-full h-1.5 cursor-ns-resize select-none transition-colors z-20 ${isDragging ? "bg-sky-500 shadow-md" : "bg-gray-800 hover:bg-sky-600/50"
                     }`}
             />
 
-            {/* Component 2: Lower Terminal Drawer */}
             <ConsoleTerminalPanel
                 consoleHeight={consoleHeight}
                 output={output}
@@ -616,12 +725,11 @@ ${challenge.starterCode || "// Write your solution logic below\n"}`;
                 onOpenLogin={() => setIsLoginScreen(true)}
             />
 
-            {/* Modals & Overlays */}
             <CertificateModal
                 isOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)}
                 reviewData={aiReviewData}
-                userName= {user.name}
+                userName={user.name}
             />
 
             {isLoginScreen && (
@@ -631,6 +739,8 @@ ${challenge.starterCode || "// Write your solution logic below\n"}`;
                     onLoginSuccess={() => { }}
                 />
             )}
+
+            <LeaderBoard />
         </div>
     );
 };
