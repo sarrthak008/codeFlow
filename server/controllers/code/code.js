@@ -3,6 +3,7 @@ import responder from "../../utils/responder.js";
 import { Question } from "../../models/question.model.js";
 import { Answer } from "../../models/answer.model.js";
 import useAI from "../../config/ai.js";
+import { User } from "../../models/user.model.js";
 
 const genarateQuestions = async (req, res) => {
     try {
@@ -12,8 +13,9 @@ const genarateQuestions = async (req, res) => {
             return responder(res, 400, {}, false, "Please Login or report bug");
         }
         const userId = reqUser._id;
-        const testIndex = 0;
-        const localSourceData = generateLocalYearlyQuestion(testIndex);
+        let user = await User.findById(userId);
+        const levelIndex = user.codeIndex || 0;
+        const localSourceData = generateLocalYearlyQuestion(levelIndex);
 
         const strictSystemPrompt = `
             Generate a unique JavaScript programming challenge based on this structural configuration: ${JSON.stringify(localSourceData)}.
@@ -107,10 +109,26 @@ const submitAnswer = async (req, res) => {
 
         let { quesitonId, code } = req.body; 
         const questionId = quesitonId;
-
+         
         if (!questionId || !code) {
             return responder(res, 400, {}, false, "Invalid payload context. Missing question or code submission.");
         }
+
+        // find user to update codex index to change question day vise 
+        let user = await User.findById(userId);
+        let today = new Date();
+        if(!user?.lastActive){
+            user.lastActive = today;
+            user.codeIndex +=1;
+        }else{
+            let lastActiveDate = new Date(user.lastActive);
+            const isGenarateOnSameDay =  lastActiveDate.getFullYear() === today.getFullYear() && lastActiveDate.getMonth() === today.getMonth() && lastActiveDate.getDate() === today.getDate();
+              if (!isGenarateOnSameDay) {
+                user.lastActive = today;
+                user.codeIndex += 1;
+            }
+        }
+        await user.save()
 
         let findedQuestion = await Question.findById(questionId);
         if (!findedQuestion) {

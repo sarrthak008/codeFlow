@@ -19,6 +19,10 @@ const userSchema = new Schema({
         ref: "Answer" 
     }],
 
+    lastActive: {
+      type:Date ,
+      default : Date.now
+    },
     role: {
         type: String,
         enum: ["user", "admin", "ai"], 

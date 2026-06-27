@@ -29,7 +29,8 @@ export const login = async (req, res) => {
         const userData = {
             id: user._id,
             name: user.name,
-            role: user.role
+            role: user.role,
+            level : user.codeIndex
         };
         return responder(res, 200, { token, user: userData }, true, "Login successful");
     } catch (error) {
