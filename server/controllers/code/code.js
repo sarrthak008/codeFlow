@@ -213,4 +213,75 @@ const submitAnswer = async (req, res) => {
 };
 
 
-export { genarateQuestions , submitAnswer };
+
+const getLeaderBoard = async (req, res) => {
+    try {
+
+        const leaderboard = await Answer.aggregate([
+            {
+                $group: {
+                    _id: "$user",
+                    totalMarks: {
+                        $sum: {
+                            $toInt: "$codeFlowAI.score"
+                        }
+                    },
+                    totalSolved: {
+                        $sum: 1
+                    }
+                }
+            },
+            {
+                $sort: {
+                    totalMarks: -1
+                }
+            },
+            {
+                $limit: 10
+            },
+            {
+                $lookup: {
+                    from: "users", // Mongo collection name
+                    localField: "_id",
+                    foreignField: "_id",
+                    as: "user"
+                }
+            },
+            {
+                $unwind: "$user"
+            },
+            {
+                $project: {
+                    _id: 0,
+                    userId: "$user._id",
+                    name: "$user.name",
+                    totalMarks: 1,
+                    totalSolved: 1
+                }
+            }
+        ]);
+
+        return responder(
+            res,
+            200,
+            leaderboard,
+            true,
+            "Leaderboard fetched successfully."
+        );
+
+    } catch (error) {
+
+        console.log(error);
+
+        return responder(
+            res,
+            500,
+            { error: error.message },
+            false,
+            "Failed to fetch leaderboard."
+        );
+    }
+};
+
+
+export { genarateQuestions , submitAnswer ,getLeaderBoard};

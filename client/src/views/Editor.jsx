@@ -309,6 +309,7 @@ const ConsoleProgressBar = ({ isRunning }) => {
 
 const ConsoleTerminalPanel = ({
     consoleHeight,
+    setIsRankBoard,
     output,
     isUserWriteCode,
     isSubmitting,
@@ -417,6 +418,46 @@ const ConsoleTerminalPanel = ({
                     >
                         <i className="ri-shield-user-fill"></i>
                     </button>
+
+                    <button
+                        className="group relative w-8 h-8 flex cursor-pointer items-center justify-center rounded bg-[#111827] border border-gray-800 text-blue-400"
+                    >
+                        <i className="ri-more-2-line text-white"></i>
+
+                        <div
+                            className="
+                                absolute
+                                right-0
+                                bottom-[130%]
+                                w-[200px]
+                                overflow-hidden
+                                rounded-xl
+                                bg-gray-800/90
+                                backdrop-blur-md
+                                border border-gray-700
+                                shadow-xl
+                                opacity-0
+                                invisible
+                                translate-y-2
+                                transition-all
+                                duration-200
+                                group-hover:opacity-100
+                                group-hover:visible
+                                group-hover:translate-y-0
+                                z-50
+                            "
+                        >
+                            <button className="w-full flex text-white cursor-pointer items-center justify-between px-4 py-3 hover:bg-gray-700 transition-colors" onClick={()=>setIsRankBoard(true)}>
+                                <span>Rank</span>
+                                <i className="ri-arrow-right-up-line"></i>
+                            </button>
+
+                            <button className="w-full flex text-white cursor-pointer items-center justify-between px-4 py-3 hover:bg-gray-700 transition-colors">
+                                <span>Notification</span>
+                                <i className="ri-notification-2-line"></i>
+                            </button>
+                        </div>
+                    </button>
                 </div>
             </div>
 
@@ -446,13 +487,13 @@ const ConsoleTerminalPanel = ({
                 {isAdmin && (
                     <>
                         {terminalHistory.map((line, index) => (
-                            <div key={index} className="mt-1">
+                            <div key={index} className="mt-1 text-md">
                                 {line}
                             </div>
                         ))}
 
                         <div className="flex items-center gap-2 mt-2">
-                            <span className="text-green-400 text-xl">
+                            <span className="text-green-400 text-md">
                                 root@codeflow(admin):~$
                             </span>
                             <input
@@ -461,7 +502,7 @@ const ConsoleTerminalPanel = ({
                                 onChange={(e) => setAdminCommand(e.target.value)}
                                 onKeyDown={handleAdminSubmit}
                                 disabled={isCommandRunning}
-                                className="flex-1 text-xl bg-transparent outline-none text-white"
+                                className="flex-1 text-md bg-transparent outline-none text-white"
                                 placeholder="Enter command..."
                             />
                             {isCommandRunning && (
@@ -561,6 +602,8 @@ const CodeEditor = () => {
 
     const [consoleHeight, setConsoleHeight] = useState(160);
     const [isDragging, setIsDragging] = useState(false);
+
+    const [isRankBoard , setIsRankBoard ] = useState(false);
 
     useEffect(() => {
         const handleMouseMove = (e) => {
@@ -714,6 +757,7 @@ ${challenge.starterCode || "// Write your solution logic below\n"}`;
 
             <ConsoleTerminalPanel
                 consoleHeight={consoleHeight}
+                setIsRankBoard = {setIsRankBoard}
                 output={output}
                 isUserWriteCode={isUserWriteCode}
                 isLoading={isLoading}
@@ -740,7 +784,9 @@ ${challenge.starterCode || "// Write your solution logic below\n"}`;
                 />
             )}
 
-            <LeaderBoard />
+            {
+                isRankBoard && <LeaderBoard setIsRankBoard={setIsRankBoard}/>
+            }
         </div>
     );
 };

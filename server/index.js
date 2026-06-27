@@ -24,7 +24,7 @@ import { protectRoute } from "./middlewares/protectRoute.js";
 // controllers
 import { executeJs } from "./controllers/js.controllers.js"
 import {addManyUsers, login} from  "./controllers/auth/auth.controller.js"
-import { genarateQuestions, submitAnswer } from "./controllers/code/code.js";
+import { genarateQuestions, submitAnswer ,getLeaderBoard } from "./controllers/code/code.js";
 import verifyAdmin from "./middlewares/verifyadmins.js";
 
 app.post("/code/run", _rateLimitor, executeJs);
@@ -32,6 +32,8 @@ app.post("/auth/login" ,login);
 app.post("/auth/adduser" ,verifyAdmin, addManyUsers);
 app.get("/codeflow/genarate",protectRoute,genarateQuestions);
 app.post("/codeflow/submit",protectRoute,submitAnswer);
+app.get("/code/rank",getLeaderBoard);
+
 
 app.get("/health", (req, res) => {
     return res.json({ message: `server is running healthy...` })
