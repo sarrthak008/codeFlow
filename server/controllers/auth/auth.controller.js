@@ -32,7 +32,7 @@ export const login = async (req, res) => {
             role: user.role,
             level : user.codeIndex
         };
-        return responder(res, 200, { token, user: userData }, true, "Login successful");
+        return responder(res, 201, { token, user: userData }, true, "Login successful");
     } catch (error) {
         console.error("Login Error:", error);
         return responder(res, 500, {}, false, "Internal server error");

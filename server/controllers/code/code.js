@@ -4,6 +4,8 @@ import { Question } from "../../models/question.model.js";
 import { Answer } from "../../models/answer.model.js";
 import useAI from "../../config/ai.js";
 import { User } from "../../models/user.model.js";
+import { getSocketServer } from "../../sockets/socket.js";
+import randomMessage from "../../utils/messages.js";
 
 const genarateQuestions = async (req, res) => {
     try {
@@ -50,7 +52,7 @@ const genarateQuestions = async (req, res) => {
         if (!jsonMatch) {
             throw new Error("AI response did not contain a valid JSON block format structure");
         }
-        
+
         let cleanJsonString = jsonMatch[0];
 
         // Replace any accidental bad character escaping sequences if they exist
@@ -64,9 +66,21 @@ const genarateQuestions = async (req, res) => {
 
         // 5. Store cleanly into Mongoose
         const savedQuestion = await Question.create({
-            title: parsedAIQuestion.title, 
-            codeFlowAiData : parsedAIQuestion,
-            userId: userId                 
+            title: parsedAIQuestion.title,
+            codeFlowAiData: parsedAIQuestion,
+            userId: userId
+        });
+
+        const sockets = getSocketServer();
+        sockets.clients.forEach((client) => {
+            if (client.readyState === 1) { // WebSocket.OPEN
+                client.send(
+                    JSON.stringify({
+                        type: "NEW_QUESTION_CREATION",
+                        message: `${user.name} create new question 😗,  ${randomMessage()} `,
+                    })
+                );
+            }
         });
 
         // 6. Return response to client playground view tracking canvas
@@ -76,9 +90,9 @@ const genarateQuestions = async (req, res) => {
             {
                 questionId: savedQuestion._id,
                 userId: savedQuestion.userId,
-                title: savedQuestion.title, 
-                description: parsedAIQuestion.description, 
-                starterCode: localSourceData.starterCode,   
+                title: savedQuestion.title,
+                description: parsedAIQuestion.description,
+                starterCode: localSourceData.starterCode,
                 technicalFocus: localSourceData.technicalFocus,
                 contextDomain: localSourceData.contextDomain
             },
@@ -107,9 +121,9 @@ const submitAnswer = async (req, res) => {
         }
         const userId = reqUser._id;
 
-        let { quesitonId, code } = req.body; 
+        let { quesitonId, code } = req.body;
         const questionId = quesitonId;
-         
+
         if (!questionId || !code) {
             return responder(res, 400, {}, false, "Invalid payload context. Missing question or code submission.");
         }
@@ -117,13 +131,13 @@ const submitAnswer = async (req, res) => {
         // find user to update codex index to change question day vise 
         let user = await User.findById(userId);
         let today = new Date();
-        if(!user?.lastActive){
+        if (!user?.lastActive) {
             user.lastActive = today;
-            user.codeIndex +=1;
-        }else{
+            user.codeIndex += 1;
+        } else {
             let lastActiveDate = new Date(user.lastActive);
-            const isGenarateOnSameDay =  lastActiveDate.getFullYear() === today.getFullYear() && lastActiveDate.getMonth() === today.getMonth() && lastActiveDate.getDate() === today.getDate();
-              if (!isGenarateOnSameDay) {
+            const isGenarateOnSameDay = lastActiveDate.getFullYear() === today.getFullYear() && lastActiveDate.getMonth() === today.getMonth() && lastActiveDate.getDate() === today.getDate();
+            if (!isGenarateOnSameDay) {
                 user.lastActive = today;
                 user.codeIndex += 1;
             }
@@ -205,6 +219,19 @@ const submitAnswer = async (req, res) => {
             await findedQuestion.save();
         }
 
+        const sockets = getSocketServer();
+        sockets.clients.forEach((client) => {
+            if (client.readyState === 1) { // WebSocket.OPEN
+                client.send(
+                    JSON.stringify({
+                        type: "NEW_ANSWER_SUBMISSION",
+                        message: `${user.name} solved a new question 🫨, ${randomMessage()}  `,
+                    })
+                );
+            }
+        });
+
+
         // 9. Return the review successfully
         return responder(
             res,
@@ -229,7 +256,6 @@ const submitAnswer = async (req, res) => {
         );
     }
 };
-
 
 
 const getLeaderBoard = async (req, res) => {
@@ -279,6 +305,18 @@ const getLeaderBoard = async (req, res) => {
             }
         ]);
 
+        const sockets = getSocketServer();
+        sockets.clients.forEach((client) => {
+            if (client.readyState === 1) { // WebSocket.OPEN
+                client.send(
+                    JSON.stringify({
+                        type: "LEADER_BOARD_OPEN",
+                        message: `${leaderboard[0].name} ne top kr liya  😵, ${randomMessage()}  `,
+                    })
+                );
+            }
+        });
+
         return responder(
             res,
             200,
@@ -286,10 +324,7 @@ const getLeaderBoard = async (req, res) => {
             true,
             "Leaderboard fetched successfully."
         );
-
     } catch (error) {
-
-        console.log(error);
 
         return responder(
             res,
@@ -301,5 +336,4 @@ const getLeaderBoard = async (req, res) => {
     }
 };
 
-
-export { genarateQuestions , submitAnswer ,getLeaderBoard};
+export { genarateQuestions, submitAnswer, getLeaderBoard };

@@ -419,45 +419,50 @@ const ConsoleTerminalPanel = ({
                         <i className="ri-shield-user-fill"></i>
                     </button>
 
-                    <button
+                    <div
                         className="group relative w-8 h-8 flex cursor-pointer items-center justify-center rounded bg-[#111827] border border-gray-800 text-blue-400"
                     >
                         <i className="ri-more-2-line text-white"></i>
 
                         <div
                             className="
-                                absolute
-                                right-0
-                                bottom-[130%]
-                                w-[200px]
-                                overflow-hidden
-                                rounded-xl
-                                bg-gray-800/90
-                                backdrop-blur-md
-                                border border-gray-700
-                                shadow-xl
-                                opacity-0
-                                invisible
-                                translate-y-2
-                                transition-all
-                                duration-200
-                                group-hover:opacity-100
-                                group-hover:visible
-                                group-hover:translate-y-0
-                                z-50
-                            "
+                                    absolute
+                                    right-0
+                                    bottom-[130%]
+                                    w-[200px]
+                                    overflow-hidden
+                                    rounded-xl
+                                    bg-gray-800/90
+                                    backdrop-blur-md
+                                    border border-gray-700
+                                    shadow-xl
+                                    opacity-0
+                                    invisible
+                                    translate-y-2
+                                    transition-all
+                                    duration-200
+                                    group-hover:opacity-100
+                                    group-hover:visible
+                                    group-hover:translate-y-0
+                                    z-50
+                                    "
                         >
-                            <button className="w-full flex text-white cursor-pointer items-center justify-between px-4 py-3 hover:bg-gray-700 transition-colors" onClick={()=>setIsRankBoard(true)}>
+                            <button
+                                className="w-full flex text-white cursor-pointer items-center justify-between px-4 py-3 hover:bg-gray-700 transition-colors"
+                                onClick={() => setIsRankBoard(true)}
+                            >
                                 <span>Rank</span>
                                 <i className="ri-arrow-right-up-line"></i>
                             </button>
 
-                            <button className="w-full flex text-white cursor-pointer items-center justify-between px-4 py-3 hover:bg-gray-700 transition-colors">
+                            <button
+                                className="w-full flex text-white cursor-pointer items-center justify-between px-4 py-3 hover:bg-gray-700 transition-colors"
+                            >
                                 <span>Notification</span>
                                 <i className="ri-notification-2-line"></i>
                             </button>
                         </div>
-                    </button>
+                    </div>
                 </div>
             </div>
 
@@ -579,9 +584,8 @@ const CodeEditor = () => {
     };
 
     let userInfo = useUser();
-    console.log(userInfo);
     const [user, SetUser] = useState({ name: userInfo?.user?.name || "", role: userInfo?.user?.role || 'user', isAdmin: userInfo?.user?.role == 'admin' ? true : false });
-    console.log(user);
+
     const [code, setCode] = useState(getInitialCode());
     const [isLoading, setIsLoading] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -603,7 +607,7 @@ const CodeEditor = () => {
     const [consoleHeight, setConsoleHeight] = useState(160);
     const [isDragging, setIsDragging] = useState(false);
 
-    const [isRankBoard , setIsRankBoard ] = useState(false);
+    const [isRankBoard, setIsRankBoard] = useState(false);
 
     useEffect(() => {
         const handleMouseMove = (e) => {
@@ -757,7 +761,7 @@ ${challenge.starterCode || "// Write your solution logic below\n"}`;
 
             <ConsoleTerminalPanel
                 consoleHeight={consoleHeight}
-                setIsRankBoard = {setIsRankBoard}
+                setIsRankBoard={setIsRankBoard}
                 output={output}
                 isUserWriteCode={isUserWriteCode}
                 isLoading={isLoading}
@@ -785,7 +789,7 @@ ${challenge.starterCode || "// Write your solution logic below\n"}`;
             )}
 
             {
-                isRankBoard && <LeaderBoard setIsRankBoard={setIsRankBoard}/>
+                isRankBoard && <LeaderBoard setIsRankBoard={setIsRankBoard} />
             }
         </div>
     );

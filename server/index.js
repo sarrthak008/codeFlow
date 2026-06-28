@@ -1,10 +1,15 @@
 import express from "express";
 import {config} from "dotenv"
+import http from "http";
+import {initSocketServer } from "./sockets/socket.js";
 config()
 const app = express();
+const server = http.createServer(app);
+initSocketServer(server)
 const PORT = 3000 || process.env.PORT;
 import cors from "cors"
 // import "./config/job.js"
+
 
 // db connetion 
  import connectdb from "./config/connectdb.js";
@@ -39,7 +44,8 @@ app.get("/health", (req, res) => {
     return res.json({ message: `server is running healthy...` })
 })
 
-app.listen(PORT, () => {
+
+server.listen(PORT, () => {
     console.log(`server listen on PORT ${PORT}`)
     connectdb()
 })
