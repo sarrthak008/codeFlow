@@ -6,6 +6,8 @@ import execturcmd from "../../utils/execute";
 import useUser from "../hooks/getUser";
 import LeaderBoard from "../components/LeaderBoard";
 import { toast } from "sonner";
+import Settings from "../components/Settings";
+import { useSetings } from "../store/Store";
 const DBURL = import.meta.env.VITE_BACKEND_URL
 
 // ============================================================================
@@ -310,6 +312,7 @@ const ConsoleProgressBar = ({ isRunning }) => {
 const ConsoleTerminalPanel = ({
     consoleHeight,
     setIsRankBoard,
+    setIsSetting,
     output,
     isUserWriteCode,
     isSubmitting,
@@ -425,12 +428,7 @@ const ConsoleTerminalPanel = ({
                         <i className="ri-more-2-line text-white"></i>
 
                         <div
-                            className="
-                                    absolute
-                                    right-0
-                                    bottom-[130%]
-                                    w-[200px]
-                                    overflow-hidden
+                            className="absolute right-0 bottom-[130%] w-[200px] overflow-hidden
                                     rounded-xl
                                     bg-gray-800/90
                                     backdrop-blur-md
@@ -448,7 +446,7 @@ const ConsoleTerminalPanel = ({
                                     "
                         >
                             <button
-                                className="w-full flex text-white cursor-pointer items-center justify-between px-4 py-3 hover:bg-gray-700 transition-colors"
+                                className="w-full flex text-white cursor-pointer items-center justify-between px-4 py-1 hover:bg-gray-700 transition-colors"
                                 onClick={() => setIsRankBoard(true)}
                             >
                                 <span>Rank</span>
@@ -456,7 +454,15 @@ const ConsoleTerminalPanel = ({
                             </button>
 
                             <button
-                                className="w-full flex text-white cursor-pointer items-center justify-between px-4 py-3 hover:bg-gray-700 transition-colors"
+                                className="w-full flex text-white cursor-pointer items-center justify-between px-4 py-1 hover:bg-gray-700 transition-colors"
+                                onClick={() => setIsSetting(true)}
+                            >
+                                <span>Settings</span>
+                                <i className="ri-settings-5-fill"></i>
+                            </button>
+
+                            <button
+                                className="w-full flex text-white cursor-pointer items-center justify-between px-4 py-1 hover:bg-gray-700 transition-colors"
                             >
                                 <span>Notification</span>
                                 <i className="ri-notification-2-line"></i>
@@ -526,17 +532,19 @@ const ConsoleTerminalPanel = ({
 // 🧩 COMPONENT 1: MONACO EDITOR PANEL
 // ============================================================================
 const MonacoEditorPanel = ({ code, setCode }) => {
+   let settings = useSetings((s)=>s.settings)
+   console.log(settings)
     return (
         <div className="flex-1 min-h-0 overflow-hidden">
             <Editor
                 height="100%"
                 defaultLanguage="javascript"
                 value={code}
-                theme="vs-dark"
+                theme= {settings.theme === "dark" ?  'vs-dark' : 'vs-light'}
                 onChange={(value) => setCode(value || "")}
                 options={{
-                    fontSize: 16,
-                    minimap: { enabled: false },
+                    fontSize: `${settings.fontSize}px`,
+                    minimap: { enabled: `${settings.minimap}` },
                     automaticLayout: true,
                     scrollBeyondLastLine: false,
                     wordWrap: "on",
@@ -608,6 +616,7 @@ const CodeEditor = () => {
     const [isDragging, setIsDragging] = useState(false);
 
     const [isRankBoard, setIsRankBoard] = useState(false);
+    const [isSettings , setIsSetting] = useState(false) 
 
     useEffect(() => {
         const handleMouseMove = (e) => {
@@ -762,6 +771,7 @@ ${challenge.starterCode || "// Write your solution logic below\n"}`;
             <ConsoleTerminalPanel
                 consoleHeight={consoleHeight}
                 setIsRankBoard={setIsRankBoard}
+                setIsSetting ={setIsSetting}
                 output={output}
                 isUserWriteCode={isUserWriteCode}
                 isLoading={isLoading}
@@ -790,6 +800,9 @@ ${challenge.starterCode || "// Write your solution logic below\n"}`;
 
             {
                 isRankBoard && <LeaderBoard setIsRankBoard={setIsRankBoard} />
+            }
+            {
+                isSettings && <Settings setIsSetting={setIsSetting} />
             }
         </div>
     );

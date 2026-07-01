@@ -1,5 +1,5 @@
 import { create } from "zustand"
-
+import {persist} from "zustand/middleware"
 
 const defaultSettings = {
     fontSize: 16,
@@ -7,9 +7,9 @@ const defaultSettings = {
     minimap: false
 }
 
-const useSetings = create((set) => ({
+const useSetings = create(persist((set,get) => ({
     settings: defaultSettings,
-
+    getSettings : ()=>get().settings,
     updateSettings: (updatedSetting) => {
         set((state) => ({
             settings: {
@@ -23,4 +23,8 @@ const useSetings = create((set) => ({
             settings: defaultSettings
         }))
     }
-}))
+}),
+{name:"editor-settings"}
+))
+
+export{useSetings}
