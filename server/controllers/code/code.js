@@ -4,7 +4,7 @@ import { Question } from "../../models/question.model.js";
 import { Answer } from "../../models/answer.model.js";
 import useAI from "../../config/ai.js";
 import { User } from "../../models/user.model.js";
-import { getSocketServer } from "../../sockets/socket.js";
+import { getSocketServer } from "sockets/socket.js";
 import randomMessage from "../../utils/messages.js";
 
 const genarateQuestions = async (req, res) => {
